@@ -48,24 +48,27 @@ export default function Login() {
 const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100vh", display: "flex",
-    alignItems: "center", justifyContent: "center", background: "#0f0f0f",
+    alignItems: "center", justifyContent: "center",
+    background: "#0a0f0a",
   },
   card: {
-    background: "#1a1a1a", padding: "2.5rem", borderRadius: "16px",
-    border: "1px solid #2a2a2a", width: "100%", maxWidth: "400px",
+    background: "#0f1a0f", padding: "2.5rem", borderRadius: "16px",
+    border: "1px solid #1a2e1a", width: "100%", maxWidth: "400px",
     display: "flex", flexDirection: "column", gap: "1rem",
+    boxShadow: "0 0 40px rgba(74,222,128,0.05)",
   },
-  title: { textAlign: "center", margin: 0, fontSize: "24px", color: "#ffffff" },
-  subtitle: { textAlign: "center", margin: 0, fontSize: "14px", color: "#6b7280" },
+  title: { textAlign: "center", margin: 0, fontSize: "26px", color: "#4ade80", fontWeight: 700 },
+  subtitle: { textAlign: "center", margin: 0, fontSize: "14px", color: "#4b5563" },
   input: {
     padding: "0.75rem 1rem", borderRadius: "10px",
-    border: "1px solid #2e2e2e", background: "#121212",
-    color: "#e5e5e5", fontSize: "14px",
+    border: "1px solid #1f2f1f", background: "#0a0f0a",
+    color: "#e5e5e5", fontSize: "14px", outline: "none",
   },
   button: {
-    padding: "0.75rem", borderRadius: "10px", background: "#4F46E5",
-    color: "#fff", border: "none", fontSize: "15px", cursor: "pointer",
+    padding: "0.75rem", borderRadius: "10px",
+    background: "#16a34a", color: "#fff",
+    border: "none", fontSize: "15px", fontWeight: 600, cursor: "pointer",
   },
   error: { color: "#f87171", fontSize: "13px", margin: 0, textAlign: "center" },
-  link: { textAlign: "center", fontSize: "13px", color: "#9ca3af" },
+  link: { textAlign: "center", fontSize: "13px", color: "#6b7280" },
 };
