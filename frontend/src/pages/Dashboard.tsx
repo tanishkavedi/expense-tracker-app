@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -238,7 +239,7 @@ export default function Dashboard() {
                   <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip
                     contentStyle={{ background: "#0f1a0f", border: "1px solid #1a2e1a", borderRadius: "8px", color: "#e5e5e5" }}
-                    formatter={(value: number) => [`₹${Number(value).toLocaleString()}`]}
+                   formatter={(value: number) => `₹${Number(value).toLocaleString()}`}
                   />
                   <Bar dataKey="income" fill="#4ade80" radius={[4, 4, 0, 0]} name="Income" />
                   <Bar dataKey="expense" fill="#f87171" radius={[4, 4, 0, 0]} name="Expense" />
@@ -257,7 +258,7 @@ export default function Dashboard() {
                     nameKey="category"
                     cx="50%" cy="50%"
                     outerRadius={80}
-                    label={({ category, percent }) => `${category} ${(percent * 100).toFixed(0)}%`}
+                   label={({ category, percent }: { category: string; percent: number }) => `${category} ${(percent * 100).toFixed(0)}%`}
                     labelLine={false}
                   >
                     {categoryData.map((_, index) => (
@@ -266,7 +267,7 @@ export default function Dashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ background: "#0f1a0f", border: "1px solid #1a2e1a", borderRadius: "8px", color: "#e5e5e5" }}
-                    formatter={(value: number) => [`₹${Number(value).toLocaleString()}`]}
+                   formatter={(value: number) => `₹${Number(value).toLocaleString()}`}
                   />
                   <Legend wrapperStyle={{ color: "#6b7280", fontSize: "12px" }} />
                 </PieChart>
