@@ -119,243 +119,280 @@ export default function Dashboard() {
     : transactions.filter((t) => t.type === filter);
 
   return (
-    <div style={styles.container}>
-      {/* Navbar */}
-      <div style={styles.navbar}>
-        <h2 style={styles.navTitle}>💰 Expense Tracker</h2>
-        <div style={styles.navRight}>
-          <span style={styles.welcome}>Hi, {user.name}</span>
-          <button style={styles.logoutBtn} onClick={handleLogout}>Logout</button>
+    <div style={s.page}>
+
+      {/* Sidebar */}
+      <div style={s.sidebar}>
+        <div>
+          <h1 style={s.logo}>💰</h1>
+          <p style={s.logoText}>Expense<br />Tracker</p>
+        </div>
+        <nav style={s.nav}>
+          {(["all", "income", "expense"] as const).map((f) => (
+            <button key={f} style={{ ...s.navBtn, ...(filter === f ? s.navBtnActive : {}) }}
+              onClick={() => setFilter(f)}>
+              {f === "all" ? "📊" : f === "income" ? "📈" : "📉"}
+              <span style={{ marginLeft: "0.6rem", textTransform: "capitalize" }}>{f}</span>
+            </button>
+          ))}
+        </nav>
+        <div style={s.sidebarBottom}>
+          <p style={s.userName}>{user.name}</p>
+          <p style={s.userEmail}>{user.email}</p>
+          <button style={s.logoutBtn} onClick={handleLogout}>Logout</button>
         </div>
       </div>
 
-      <div style={styles.content}>
-        {error && <p style={styles.error}>{error}</p>}
+      {/* Main Content */}
+      <div style={s.main}>
 
-        {/* Summary Cards */}
-        <div style={styles.cards}>
-          <div style={{ ...styles.card, borderTop: "3px solid #22c55e" }}>
-            <p style={styles.cardLabel}>Total Income</p>
-            <p style={{ ...styles.cardAmount, color: "#22c55e" }}>
-              ₹ {Number(summary.total_income).toLocaleString()}
-            </p>
-          </div>
-          <div style={{ ...styles.card, borderTop: "3px solid #ef4444" }}>
-            <p style={styles.cardLabel}>Total Expense</p>
-            <p style={{ ...styles.cardAmount, color: "#ef4444" }}>
-              ₹ {Number(summary.total_expense).toLocaleString()}
-            </p>
-          </div>
-          <div style={{ ...styles.card, borderTop: "3px solid #4F46E5" }}>
-            <p style={styles.cardLabel}>Balance</p>
-            <p style={{ ...styles.cardAmount, color: Number(summary.balance) >= 0 ? "#22c55e" : "#ef4444" }}>
-              ₹ {Number(summary.balance).toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div style={styles.actions}>
-          <div style={styles.filters}>
-            {(["all", "income", "expense"] as const).map((f) => (
-              <button key={f} style={{ ...styles.filterBtn, ...(filter === f ? styles.filterActive : {}) }}
-                onClick={() => setFilter(f)}>
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
+        {/* Header */}
+        <div style={s.header}>
+          <div>
+            <h2 style={s.headerTitle}>Good day, {user.name}! 👋</h2>
+            <p style={s.headerSub}>Here's your financial overview</p>
           </div>
           <div style={{ display: "flex", gap: "0.75rem" }}>
-            <button style={styles.categoryBtn} onClick={() => setShowCategoryForm(true)}>
-              + Category
-            </button>
-            <button style={styles.addBtn} onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}>
+            <button style={s.secBtn} onClick={() => setShowCategoryForm(true)}>+ Category</button>
+            <button style={s.primaryBtn} onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}>
               + Transaction
             </button>
           </div>
         </div>
 
-        {/* Category Form Modal */}
-        {showCategoryForm && (
-          <div style={styles.modal}>
-            <div style={styles.modalCard}>
-              <h3 style={styles.modalTitle}>Add Category</h3>
-              <input style={styles.input} placeholder="Category name"
-                value={newCategory.name}
-                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })} />
-              <select style={styles.input} value={newCategory.type}
-                onChange={(e) => setNewCategory({ ...newCategory, type: e.target.value as "income" | "expense" })}>
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </select>
-              <div style={styles.modalButtons}>
-                <button style={styles.cancelBtn} onClick={() => setShowCategoryForm(false)}>Cancel</button>
-                <button style={styles.saveBtn} onClick={handleAddCategory}>Save</button>
-              </div>
-            </div>
-          </div>
-        )}
+        {error && <p style={s.error}>{error}</p>}
 
-        {/* Transaction Form Modal */}
-        {showForm && (
-          <div style={styles.modal}>
-            <div style={styles.modalCard}>
-              <h3 style={styles.modalTitle}>{editingId ? "Edit Transaction" : "Add Transaction"}</h3>
-              <select style={styles.input} value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value as "income" | "expense" })}>
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-              </select>
-              <select style={styles.input} value={form.category_id}
-                onChange={(e) => setForm({ ...form, category_id: Number(e.target.value) })}>
-                <option value={0}>Select Category</option>
-                {categories.filter(c => c.type === form.type).map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-              <input style={styles.input} type="number" placeholder="Amount"
-                value={form.amount}
-                onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} />
-              <input style={styles.input} placeholder="Description"
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })} />
-              <input style={styles.input} type="date" value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              <div style={styles.modalButtons}>
-                <button style={styles.cancelBtn} onClick={() => setShowForm(false)}>Cancel</button>
-                <button style={styles.saveBtn} onClick={handleSubmit}>Save</button>
-              </div>
-            </div>
+        {/* Summary Cards */}
+        <div style={s.summaryGrid}>
+          <div style={{ ...s.summaryCard, background: "linear-gradient(135deg, #14532d, #166534)" }}>
+            <p style={s.summaryLabel}>💵 Total Income</p>
+            <p style={s.summaryAmount}>₹ {Number(summary.total_income).toLocaleString()}</p>
+            <p style={s.summaryNote}>All time earnings</p>
           </div>
-        )}
+          <div style={{ ...s.summaryCard, background: "linear-gradient(135deg, #450a0a, #7f1d1d)" }}>
+            <p style={s.summaryLabel}>💸 Total Expense</p>
+            <p style={s.summaryAmount}>₹ {Number(summary.total_expense).toLocaleString()}</p>
+            <p style={s.summaryNote}>All time spending</p>
+          </div>
+          <div style={{
+            ...s.summaryCard,
+            background: Number(summary.balance) >= 0
+              ? "linear-gradient(135deg, #052e16, #14532d)"
+              : "linear-gradient(135deg, #2d0a0a, #450a0a)"
+          }}>
+            <p style={s.summaryLabel}>🏦 Balance</p>
+            <p style={{ ...s.summaryAmount, color: Number(summary.balance) >= 0 ? "#4ade80" : "#f87171" }}>
+              ₹ {Number(summary.balance).toLocaleString()}
+            </p>
+            <p style={s.summaryNote}>{Number(summary.balance) >= 0 ? "You're doing great!" : "Overspent!"}</p>
+          </div>
+        </div>
 
-        {/* Transactions List */}
+        {/* Transactions Heading */}
+        <div style={s.sectionHeader}>
+          <h3 style={s.sectionTitle}>
+            {filter === "all" ? "All Transactions" : filter === "income" ? "Income" : "Expenses"}
+            <span style={s.count}>{filtered.length}</span>
+          </h3>
+        </div>
+
+        {/* Transaction Cards */}
         {filtered.length === 0 ? (
-          <p style={styles.empty}>No transactions yet. Add your first one!</p>
+          <div style={s.emptyState}>
+            <p style={s.emptyIcon}>🪙</p>
+            <p style={s.emptyText}>No transactions yet</p>
+            <p style={s.emptySubText}>Add your first transaction to get started</p>
+          </div>
         ) : (
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  {["Date", "Description", "Category", "Type", "Amount", "Actions"].map((h) => (
-                    <th key={h} style={styles.th}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((t) => (
-                  <tr key={t.id} style={styles.tr}>
-                    <td style={styles.td}>{new Date(t.date).toLocaleDateString()}</td>
-                    <td style={styles.td}>{t.description}</td>
-                    <td style={styles.td}>
-                      <span style={styles.badge}>{t.category_name}</span>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={{
-                        ...styles.typeBadge,
-                        background: t.type === "income" ? "#14532d" : "#450a0a",
-                        color: t.type === "income" ? "#22c55e" : "#ef4444",
-                      }}>
-                        {t.type}
-                      </span>
-                    </td>
-                    <td style={{ ...styles.td, color: t.type === "income" ? "#22c55e" : "#ef4444", fontWeight: 500 }}>
-                      {t.type === "income" ? "+" : "-"} ₹{Number(t.amount).toLocaleString()}
-                    </td>
-                    <td style={styles.td}>
-                      <button style={styles.editBtn} onClick={() => handleEdit(t)}>Edit</button>
-                      <button style={styles.deleteBtn} onClick={() => handleDelete(t.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={s.transactionGrid}>
+            {filtered.map((t) => (
+              <div key={t.id} style={s.transactionCard}>
+                <div style={s.transactionTop}>
+                  <div style={{
+                    ...s.typeIcon,
+                    background: t.type === "income" ? "#14532d" : "#450a0a",
+                  }}>
+                    {t.type === "income" ? "📈" : "📉"}
+                  </div>
+                  <div style={s.transactionInfo}>
+                    <p style={s.transactionDesc}>{t.description || "No description"}</p>
+                    <p style={s.transactionCategory}>{t.category_name}</p>
+                  </div>
+                  <div style={s.transactionRight}>
+                    <p style={{
+                      ...s.transactionAmount,
+                      color: t.type === "income" ? "#4ade80" : "#f87171",
+                    }}>
+                      {t.type === "income" ? "+" : "-"}₹{Number(t.amount).toLocaleString()}
+                    </p>
+                    <p style={s.transactionDate}>
+                      {new Date(t.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  </div>
+                </div>
+                <div style={s.transactionActions}>
+                  <button style={s.editBtn} onClick={() => handleEdit(t)}>✏️ Edit</button>
+                  <button style={s.deleteBtn} onClick={() => handleDelete(t.id)}>🗑️ Delete</button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
+
+      {/* Category Modal */}
+      {showCategoryForm && (
+        <div style={s.modal}>
+          <div style={s.modalCard}>
+            <h3 style={s.modalTitle}>Add Category</h3>
+            <input style={s.input} placeholder="Category name"
+              value={newCategory.name}
+              onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })} />
+            <select style={s.input} value={newCategory.type}
+              onChange={(e) => setNewCategory({ ...newCategory, type: e.target.value as "income" | "expense" })}>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+            <div style={s.modalButtons}>
+              <button style={s.cancelBtn} onClick={() => setShowCategoryForm(false)}>Cancel</button>
+              <button style={s.saveBtn} onClick={handleAddCategory}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transaction Modal */}
+      {showForm && (
+        <div style={s.modal}>
+          <div style={s.modalCard}>
+            <h3 style={s.modalTitle}>{editingId ? "Edit Transaction" : "Add Transaction"}</h3>
+            <select style={s.input} value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value as "income" | "expense" })}>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+            <select style={s.input} value={form.category_id}
+              onChange={(e) => setForm({ ...form, category_id: Number(e.target.value) })}>
+              <option value={0}>Select Category</option>
+              {categories.filter(c => c.type === form.type).map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <input style={s.input} type="number" placeholder="Amount"
+              value={form.amount}
+              onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} />
+            <input style={s.input} placeholder="Description"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <input style={s.input} type="date" value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })} />
+            <div style={s.modalButtons}>
+              <button style={s.cancelBtn} onClick={() => setShowForm(false)}>Cancel</button>
+              <button style={s.saveBtn} onClick={handleSubmit}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  container: { minHeight: "100vh", background: "#0a0f0a" },
-  navbar: {
-    background: "#0f1a0f", padding: "1rem 2rem",
-    display: "flex", justifyContent: "space-between", alignItems: "center",
-    borderBottom: "1px solid #1a2e1a",
+const s: Record<string, React.CSSProperties> = {
+  page: { display: "flex", minHeight: "100vh", background: "#0a0f0a" },
+
+  // Sidebar
+  sidebar: {
+    width: "220px", minHeight: "100vh", background: "#0f1a0f",
+    borderRight: "1px solid #1a2e1a", padding: "2rem 1rem",
+    display: "flex", flexDirection: "column", justifyContent: "space-between",
+    position: "sticky", top: 0, height: "100vh",
   },
-  navTitle: { color: "#4ade80", margin: 0, fontSize: "18px", fontWeight: 700 },
-  navRight: { display: "flex", alignItems: "center", gap: "1rem" },
-  welcome: { color: "#6b7280", fontSize: "14px" },
+  logo: { fontSize: "36px", textAlign: "center" },
+  logoText: { textAlign: "center", color: "#4ade80", fontWeight: 700, fontSize: "15px", lineHeight: 1.4, marginTop: "0.5rem" },
+  nav: { display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "2rem" },
+  navBtn: {
+    padding: "0.7rem 1rem", borderRadius: "10px",
+    background: "transparent", color: "#6b7280",
+    border: "none", cursor: "pointer", fontSize: "14px",
+    textAlign: "left", display: "flex", alignItems: "center",
+  },
+  navBtnActive: { background: "#14532d", color: "#4ade80" },
+  sidebarBottom: { borderTop: "1px solid #1a2e1a", paddingTop: "1rem" },
+  userName: { color: "#e5e5e5", fontSize: "14px", fontWeight: 500, margin: "0 0 0.2rem" },
+  userEmail: { color: "#6b7280", fontSize: "12px", margin: "0 0 0.75rem" },
   logoutBtn: {
-    padding: "0.4rem 1rem", borderRadius: "8px",
+    width: "100%", padding: "0.5rem", borderRadius: "8px",
     background: "transparent", color: "#6b7280",
     border: "1px solid #1f2f1f", cursor: "pointer", fontSize: "13px",
   },
-  content: { padding: "2rem" },
-  cards: {
-    display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "1rem", marginBottom: "2rem",
-  },
-  card: {
-    background: "#0f1a0f", borderRadius: "12px",
-    padding: "1.5rem", border: "1px solid #1a2e1a",
-  },
-  cardLabel: { margin: "0 0 0.5rem", fontSize: "13px", color: "#6b7280" },
-  cardAmount: { margin: 0, fontSize: "28px", fontWeight: 700 },
-  actions: {
+
+  // Main
+  main: { flex: 1, padding: "2rem", overflowY: "auto" },
+  header: {
     display: "flex", justifyContent: "space-between",
-    alignItems: "center", marginBottom: "1.5rem",
+    alignItems: "center", marginBottom: "2rem",
   },
-  filters: { display: "flex", gap: "0.5rem" },
-  filterBtn: {
-    padding: "0.4rem 1rem", borderRadius: "20px",
-    background: "#0f1a0f", color: "#6b7280",
-    border: "1px solid #1a2e1a", cursor: "pointer", fontSize: "13px",
-  },
-  filterActive: {
-    background: "#14532d", color: "#4ade80",
-    border: "1px solid #16a34a",
-  },
-  categoryBtn: {
-    padding: "0.6rem 1.2rem", borderRadius: "8px",
-    background: "#0f1a0f", color: "#6b7280",
-    border: "1px solid #1f2f1f", cursor: "pointer", fontSize: "14px",
-  },
-  addBtn: {
+  headerTitle: { color: "#ffffff", fontSize: "22px", fontWeight: 700, margin: 0 },
+  headerSub: { color: "#6b7280", fontSize: "14px", margin: "0.25rem 0 0" },
+  primaryBtn: {
     padding: "0.6rem 1.2rem", borderRadius: "8px",
     background: "#16a34a", color: "#fff",
     border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 500,
   },
-  error: { color: "#f87171", marginBottom: "1rem" },
-  empty: { textAlign: "center", color: "#6b7280", marginTop: "3rem" },
-  tableWrapper: {
-    background: "#0f1a0f", borderRadius: "12px",
-    overflow: "hidden", border: "1px solid #1a2e1a",
+  secBtn: {
+    padding: "0.6rem 1.2rem", borderRadius: "8px",
+    background: "#0f1a0f", color: "#4ade80",
+    border: "1px solid #16a34a", cursor: "pointer", fontSize: "14px",
   },
-  table: { width: "100%", borderCollapse: "collapse" },
-  th: {
-    padding: "0.75rem 1rem", textAlign: "left",
-    background: "#0a0f0a", fontSize: "12px", color: "#6b7280",
-    borderBottom: "1px solid #1a2e1a",
-    textTransform: "uppercase", letterSpacing: "0.05em",
-  },
-  tr: { borderBottom: "1px solid #111a11" },
-  td: { padding: "0.85rem 1rem", fontSize: "14px", color: "#e5e5e5" },
-  badge: {
-    padding: "0.2rem 0.6rem", borderRadius: "20px",
-    background: "#14532d", color: "#4ade80", fontSize: "12px",
-  },
-  typeBadge: { padding: "0.2rem 0.6rem", borderRadius: "20px", fontSize: "12px" },
-  editBtn: {
-    padding: "0.3rem 0.8rem", borderRadius: "6px", marginRight: "0.5rem",
+
+  // Summary
+  summaryGrid: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem", marginBottom: "2rem" },
+  summaryCard: { borderRadius: "16px", padding: "1.5rem", border: "1px solid #1a2e1a" },
+  summaryLabel: { margin: "0 0 0.5rem", fontSize: "13px", color: "rgba(255,255,255,0.7)" },
+  summaryAmount: { margin: "0 0 0.25rem", fontSize: "26px", fontWeight: 700, color: "#fff" },
+  summaryNote: { margin: 0, fontSize: "12px", color: "rgba(255,255,255,0.5)" },
+
+  // Section
+  sectionHeader: { display: "flex", alignItems: "center", marginBottom: "1rem" },
+  sectionTitle: { color: "#e5e5e5", fontSize: "16px", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "0.5rem" },
+  count: {
     background: "#14532d", color: "#4ade80",
-    border: "1px solid #16a34a", cursor: "pointer", fontSize: "13px",
+    padding: "0.1rem 0.5rem", borderRadius: "20px", fontSize: "12px",
+  },
+
+  // Transaction Cards
+  transactionGrid: { display: "flex", flexDirection: "column", gap: "0.75rem" },
+  transactionCard: {
+    background: "#0f1a0f", borderRadius: "12px",
+    border: "1px solid #1a2e1a", padding: "1rem 1.25rem",
+  },
+  transactionTop: { display: "flex", alignItems: "center", gap: "1rem" },
+  typeIcon: { width: "40px", height: "40px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", flexShrink: 0 },
+  transactionInfo: { flex: 1 },
+  transactionDesc: { margin: "0 0 0.2rem", color: "#e5e5e5", fontSize: "14px", fontWeight: 500 },
+  transactionCategory: { margin: 0, color: "#6b7280", fontSize: "12px" },
+  transactionRight: { textAlign: "right" },
+  transactionAmount: { margin: "0 0 0.2rem", fontSize: "16px", fontWeight: 700 },
+  transactionDate: { margin: 0, color: "#6b7280", fontSize: "12px" },
+  transactionActions: { display: "flex", gap: "0.5rem", marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid #1a2e1a" },
+  editBtn: {
+    padding: "0.3rem 0.8rem", borderRadius: "6px",
+    background: "#14532d", color: "#4ade80",
+    border: "1px solid #16a34a", cursor: "pointer", fontSize: "12px",
   },
   deleteBtn: {
     padding: "0.3rem 0.8rem", borderRadius: "6px",
     background: "#2d1515", color: "#f87171",
-    border: "1px solid #7f1d1d", cursor: "pointer", fontSize: "13px",
+    border: "1px solid #7f1d1d", cursor: "pointer", fontSize: "12px",
   },
+
+  // Empty
+  emptyState: { textAlign: "center", padding: "4rem 0" },
+  emptyIcon: { fontSize: "48px", margin: "0 0 1rem" },
+  emptyText: { color: "#e5e5e5", fontSize: "18px", fontWeight: 500, margin: "0 0 0.5rem" },
+  emptySubText: { color: "#6b7280", fontSize: "14px", margin: 0 },
+
+  // Modal
   modal: {
     position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
     background: "rgba(0,0,0,0.8)", display: "flex",
@@ -363,9 +400,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   modalCard: {
     background: "#0f1a0f", borderRadius: "16px", border: "1px solid #1a2e1a",
-    padding: "2rem", width: "100%", maxWidth: "480px",
+    padding: "2rem", width: "100%", maxWidth: "440px",
     display: "flex", flexDirection: "column", gap: "0.75rem",
-    boxShadow: "0 0 40px rgba(74,222,128,0.08)",
   },
   modalTitle: { margin: 0, fontSize: "18px", color: "#4ade80", fontWeight: 600 },
   input: {
@@ -373,10 +409,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid #1f2f1f", background: "#0a0f0a",
     color: "#e5e5e5", fontSize: "14px",
   },
-  modalButtons: {
-    display: "flex", gap: "0.75rem",
-    justifyContent: "flex-end", marginTop: "0.5rem",
-  },
+  modalButtons: { display: "flex", gap: "0.75rem", justifyContent: "flex-end", marginTop: "0.5rem" },
   cancelBtn: {
     padding: "0.6rem 1.2rem", borderRadius: "8px",
     background: "#0f1a0f", color: "#6b7280",
@@ -384,7 +417,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   saveBtn: {
     padding: "0.6rem 1.2rem", borderRadius: "8px",
-    background: "#16a34a", color: "#fff",
-    border: "none", cursor: "pointer", fontWeight: 500,
+    background: "#16a34a", color: "#fff", border: "none", cursor: "pointer", fontWeight: 500,
   },
+
+  error: { color: "#f87171", marginBottom: "1rem" },
 };
