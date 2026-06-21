@@ -8,6 +8,34 @@ import {
   getSummary
 } from "../models/transactionModel";
 
+import { getMonthlyData, getCategoryBreakdown } from "../models/transactionModel";
+
+export const fetchMonthlyData = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const data = await getMonthlyData(req.user!.userId);
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: (err as Error).message });
+  }
+};
+
+export const fetchCategoryBreakdown = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const data = await getCategoryBreakdown(req.user!.userId);
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: (err as Error).message });
+  }
+};
+
+
+
 export const fetchTransactions = async (
   req: AuthenticatedRequest,
   res: Response

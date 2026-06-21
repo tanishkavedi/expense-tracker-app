@@ -62,3 +62,37 @@ export const getSummary = async (userId: number) => {
   );
   return result.rows[0];
 };
+
+
+export const getMonthlyData = async (userId: number) => {
+  const result = await pool.query(
+    `SELECT
+       TO_CHAR(date, 'Mon YYYY') as month,
+       TO_CHAR(date, 'YYYY-MM') as month_key,
+       SUM(CASE WHEN type='income' THEN amount ELSE 0 END) as income,
+       SUM(CASE WHEN type='expense' THEN amount ELSE 0 END) as expense
+     FROM transactions
+     WHERE user_id = $1
+     GROUP BY month, month_key
+     ORDER BY month_key ASC
+     LIMIT 6`,
+    [userId]
+  );
+  return result.rows;
+};
+
+export const getCategoryBreakdown = async (userId: number) => {
+  const result = await pool.query(
+    `SELECT
+       c.name as category,
+       c.type,
+       SUM(t.amount) as total
+     FROM transactions t
+     JOIN categories c ON c.id = t.category_id
+     WHERE t.user_id = $1
+     GROUP BY c.name, c.type
+     ORDER BY total DESC`,
+    [userId]
+  );
+  return result.rows;
+};

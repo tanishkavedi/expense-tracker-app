@@ -18,6 +18,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/transactions", transactionRoutes);
 
+
+app.use((req, res) => {
+  console.log("Hit route:", req.method, req.url);
+  res.status(404).json({ message: `Route not found: ${req.url}` });
+});
+
+
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Expense Tracker API running");
 });
